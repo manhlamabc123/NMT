@@ -1,0 +1,8 @@
+__pycache__
+evalute/__pycache__
+train/__pycache__
+preprocessing/__pycache__
+model/__pycache__
+nmt
+.ipynb_checkpoints
+pre_train_model
