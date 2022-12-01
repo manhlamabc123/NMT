@@ -15,6 +15,7 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument('-d', '--data', action='store_true', help='data preprocessing')
 group.add_argument('-t', '--train', action='store_true', help='train model')
 group.add_argument('-e', '--evaluate', action='store_true', help='evalute model')
+group.add_argument('-a', '--attention', action='store_true', help='attention visualize')
 args = parser.parse_args()
 
 if args.data:
@@ -81,3 +82,29 @@ if args.evaluate:
         bleu_scr = translate(test_set_loader, model, vocab_transform)
         
     print(f"--> Bleu Score: {bleu_scr}")
+
+if args.attention:
+    print("Attention visualizing...\n")
+
+    print("Load dataset...\n")
+    _, _, test_set_loader, text_transform, vocab_transform = load_data()
+    SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE])
+    TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
+
+    print("Initialize model...\n")
+    if args.model == "gru":
+        model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+    elif args.model == "attention":
+        model = Seq2SeqAttentionGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+    elif args.model == "transformer":
+        model = Transformer(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+    else:
+        model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+
+    print("Load pre-trained model...\n")
+    model.load_state_dict(torch.load(f"pre_train_model/{model.name}"))
+
+    if args.model == "attention":
+        model.get_attention(test_set_loader)
+    else:
+        print("No attention.\n")

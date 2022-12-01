@@ -20,13 +20,14 @@ class Seq2SeqAttentionGRU(nn.Module):
         self.encoder = EncoderBiGRU(input_size, embedding_size, hidden_size, dropout_rate)
         self.decoder = DecoderAttentionGRU(output_size, embedding_size, hidden_size, dropout_rate, batch_size)
 
-    def forward(self, input, target=None):
+    def forward(self, input, target=None, attention_return=False):
         # Initialize some variables
         if target == None:
             target_sequence_length = 20
         else:
             target_sequence_length = target.shape[0]
         decoder_outputs = torch.zeros((target_sequence_length, self.batch_size, self.decoder.output_size), device=DEVICE)
+        attentions = torch.zeros((input.shape[0], self.batch_size, target_sequence_length), device=DEVICE)
 
         # input (input_sequence_length, BATCH_SIZE)
         encoder_hidden_states, _ = self.encoder(input)
@@ -37,14 +38,30 @@ class Seq2SeqAttentionGRU(nn.Module):
 
         for j in range(target_sequence_length):
             # Input (1, BATCH_SIZE), Hidden state (1, BATCH_SIZE, HIDDEN_SIZE)
-            decoder_output, decoder_hidden_state = self.decoder(decoder_input, decoder_hidden_state, encoder_hidden_states)
+            if attention_return:
+                decoder_output, decoder_hidden_state, attention = self.decoder(decoder_input, decoder_hidden_state, encoder_hidden_states, attention_return)
+            else:
+                decoder_output, decoder_hidden_state = self.decoder(decoder_input, decoder_hidden_state, encoder_hidden_states, attention_return)
             # Output (1, BATCH_SIZE, output's dictionaty length), Hidden state (1, BATCH_SIZE, HIDDEN_SIZE)
             if self.training:
                 decoder_input = teacher_forcing(decoder_output, target[j]) # (1, BATCH_SIZE)
             else:
                 decoder_input = decoder_output.argmax(2) # (1, BATCH_SIZE)
             decoder_outputs[j] = decoder_output.squeeze()
+            if attention_return == True:
+                attentions[:,:,j] = attention.squeeze()
 
-            
+        if attention_return == False:
+            return decoder_outputs
+        else:
+            return decoder_outputs, attentions
 
-        return decoder_outputs
+    def get_attention(self, dataset_loader):
+
+        for i, data in enumerate(dataset_loader):
+            input, target = data
+            input, target = input.to(DEVICE), target.to(DEVICE)
+
+            output, attention = self(input, target, attention_return=True)
+
+            print(attention)

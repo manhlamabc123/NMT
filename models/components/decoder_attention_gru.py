@@ -14,14 +14,14 @@ class DecoderAttentionGRU(nn.Module):
         self.dropout = nn.Dropout(dropout_rate)
 
         self.energy = nn.Linear(3*hidden_size, 1)
-        self.softmax = nn.Softmax(dim=2)
+        self.softmax = nn.Softmax(dim=0)
         self.relu = nn.ReLU()
 
         self.gru = nn.GRU(2*hidden_size + embedding_size, hidden_size)
         self.linear = nn.Linear(hidden_size, output_size)
         self.log_softmax = nn.LogSoftmax(dim=2)
 
-    def forward(self, decoder_input, decoder_hidden_state, encoder_hidden_states):
+    def forward(self, decoder_input, decoder_hidden_state, encoder_hidden_states, attention_return=False):
         # decoder_input (1, BATCH_SIZE)
         # decoder_hidden_state (1, BATCH_SIZE, 2*HIDDEN_STATE)
         # encoder_hidden_states (input's sequence_length, BATCH_SIZE, 2*HIDDEN_STATE)
@@ -35,7 +35,7 @@ class DecoderAttentionGRU(nn.Module):
         # (1, BATCH_SIZE, HIDDEN_SIZE) -> (input's sequence_length, BATCH_SIZE, HIDDEN_SIZE)
         hidden_state = torch.cat((decoder_hidden_state_expaned, encoder_hidden_states), dim=2)
         # (input's sequence_length, BATCH_SIZE, 3*HIDDEN_SIZE)
-        attention_score = torch.tanh(self.energy(hidden_state)) # (input's sequence_length, BATCH_SIZE, 1)
+        attention_score = self.energy(hidden_state) # (input's sequence_length, BATCH_SIZE, 1)
         attention_distribution = self.softmax(attention_score) # (input's sequence_length, BATCH_SIZE, 1)
         attention_output = torch.bmm(attention_distribution.permute(1, 2, 0), encoder_hidden_states.permute(1, 0, 2)) 
         # (BATCH_SIZE, 1, 2*HIDDEN_SIZE)
@@ -50,4 +50,7 @@ class DecoderAttentionGRU(nn.Module):
         output = self.linear(output) # (1, BATCH_SIZE, DICTIONARY_LENGTH)
         output = self.log_softmax(output) # (1, BATCH_SIZE, DICTIONARY_LENGTH)
         
-        return output, decoder_hidden_state
+        if attention_return:
+            return output, decoder_hidden_state, attention_distribution
+        else:
+            return output, decoder_hidden_state
