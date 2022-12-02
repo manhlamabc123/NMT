@@ -6,7 +6,7 @@ from models.models.transformer import Transformer
 from constants import *
 from train.train import train
 from train.train_transformer import train_transformer
-from helper.plot import plot_loss, plot_bleu, plot_bleu_per_sentence
+from helper.plot import plot_loss, plot_bleu, plot_bleu_per_sentence, plot_attention
 from helper.translate import translate, transformer_translate
 
 parser = argparse.ArgumentParser(description="This is just a description")
@@ -108,7 +108,9 @@ if args.attention:
     print("Load pre-trained model...\n")
     model.load_state_dict(torch.load(f"pre_train_model/{model.name}"))
 
-    model.get_attention(test_set_loader)
+    attentions = model.get_attention(test_set_loader)
+
+    plot_attention(test_set_loader, attentions, vocab_transform)
 
 if args.bleu:
     print("Plot bleu...\n")

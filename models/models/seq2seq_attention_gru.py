@@ -57,11 +57,14 @@ class Seq2SeqAttentionGRU(nn.Module):
             return decoder_outputs, attentions
 
     def get_attention(self, dataset_loader):
+        attentions = []
 
         for i, data in enumerate(dataset_loader):
             input, target = data
             input, target = input.to(DEVICE), target.to(DEVICE)
 
-            output, attention = self(input, target, attention_return=True)
+            _, attention = self(input, target, attention_return=True)
 
-            print(attention)
+            attentions.append(attention)
+
+        return attentions

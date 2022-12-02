@@ -2,6 +2,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from torch import Tensor
 
 def plot_loss(model):
     plot_train_loss = torch.load(f'graphs/data/{model.name}_train_loss')
@@ -64,3 +65,19 @@ def plot_bleu_per_sentence(model):
     plt.ylabel('Bleu Score')
     plt.savefig(f"graphs/graphs/bleu_per_sentence_{model.name}_{time_stamp}.png")
     plt.figure().clear()
+
+def plot_attention(dataset_loader, attentions, vocab_transform):
+    batch_size = attentions.shape[1]
+    for i, data in enumerate(dataset_loader):
+        input, target = data
+        attention = attentions[i]
+
+        for batch in range(batch_size):
+            plot_x = input[:, batch].cpu().detach().numpy()
+            plot_y = target[:, batch].cpu().detech().numpy()
+            plot_attention = attention[:, batch]
+            print(plot_x, plot_y, plot_attention)
+
+            break
+
+        break
