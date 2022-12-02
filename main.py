@@ -6,7 +6,7 @@ from models.models.transformer import Transformer
 from constants import *
 from train.train import train
 from train.train_transformer import train_transformer
-from helper.plot import plot_loss, plot_bleu
+from helper.plot import plot_loss, plot_bleu, plot_bleu_per_sentence
 from helper.translate import translate, transformer_translate
 
 parser = argparse.ArgumentParser(description="This is just a description")
@@ -16,6 +16,7 @@ group.add_argument('-d', '--data', action='store_true', help='data preprocessing
 group.add_argument('-t', '--train', action='store_true', help='train model')
 group.add_argument('-e', '--evaluate', action='store_true', help='evalute model')
 group.add_argument('-a', '--attention', action='store_true', help='attention visualize')
+group.add_argument('-b', '--bleu', action='store_true', help='plot bleu')
 args = parser.parse_args()
 
 if args.data:
@@ -92,6 +93,25 @@ if args.attention:
     TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
 
     print("Initialize model...\n")
+    model = Seq2SeqAttentionGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+
+    print("Load pre-trained model...\n")
+    model.load_state_dict(torch.load(f"pre_train_model/{model.name}"))
+
+    model.get_attention(test_set_loader)
+
+if args.bleu:
+    print("Plot bleu...\n")
+
+    print("Sort data...\n")
+    data_preprocessing(sort=True)
+
+    print("Load dataset...\n")
+    _, _, test_set_loader, text_transform, vocab_transform = load_data()
+    SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE])
+    TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
+
+    print("Initialize model...\n")
     if args.model == "gru":
         model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
     elif args.model == "attention":
@@ -104,7 +124,9 @@ if args.attention:
     print("Load pre-trained model...\n")
     model.load_state_dict(torch.load(f"pre_train_model/{model.name}"))
 
-    if args.model == "attention":
-        model.get_attention(test_set_loader)
+    if args.model == "transformer":
+        bleu_scr = transformer_translate(test_set_loader, model, vocab_transform)
     else:
-        print("No attention.\n")
+        bleu_scr = translate(test_set_loader, model, vocab_transform)
+        
+    plot_bleu_per_sentence(model)

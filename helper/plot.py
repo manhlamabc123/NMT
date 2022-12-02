@@ -30,3 +30,13 @@ def plot_bleu(model):
     plt.xticks(np.arange(1, len(plot_train_bleu)+1, 5))
     plt.savefig(f"graphs/graphs/bleu_{model.name}_{time_stamp}.png")
     plt.figure().clear()
+
+def plot_bleu_per_sentence(model):
+    plot_bleu_per_sentence = torch.load('graphs/data/bleu_per_sentences')
+    time_stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    plt.title(f'{model.name}: Bleu score on each sentence, length increase')
+    plt.bar(plot_bleu_per_sentence[:100])
+    plt.xlabel('Sentence length increase')
+    plt.ylabel('Bleu Score')
+    plt.savefig(f"graphs/graphs/bleu_per_sentence_{model.name}_{time_stamp}.png")
+    plt.figure().clear()

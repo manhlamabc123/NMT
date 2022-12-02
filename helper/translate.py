@@ -5,6 +5,7 @@ from nltk.translate.bleu_score import sentence_bleu
 def translate(dataset_loader, model, vocab_transform):
     bleu_per_epoch = 0
     model.eval()
+    bleu_per_sentences = []
 
     for i, data in enumerate(dataset_loader):
         input, target = data
@@ -27,18 +28,22 @@ def translate(dataset_loader, model, vocab_transform):
             print(f"Input: {translated_input}")
             print(f"Target: {translated_target}")
             print(f"Translated: {translated_output}")
+            print(f"Bleu: {bleu_per_tensor}")
             print("\n")
 
+            bleu_per_sentences.append(bleu_per_tensor)
             bleu_per_batch += bleu_per_tensor
 
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
         bleu_per_epoch += bleu_per_batch
 
+    torch.save(bleu_per_sentences, "graphs/data/bleu_per_sentences")
     return bleu_per_epoch / len(dataset_loader)
 
 def transformer_translate(dataset_loader, model, vocab_transform):
     bleu_per_epoch = 0
     model.eval()
+    bleu_per_sentences = []
 
     for i, data in enumerate(dataset_loader):
         input, target = data
@@ -59,13 +64,15 @@ def transformer_translate(dataset_loader, model, vocab_transform):
 
             print(f"Input: {translated_input}")
             print(f"Target: {translated_target}")
-            print(f"Pre-translate: {output[:, j]}")
             print(f"Translated: {translated_output}")
+            print(f"Bleu: {bleu_per_tensor}")
             print("\n")
 
+            bleu_per_sentences.append(bleu_per_tensor)
             bleu_per_batch += bleu_per_tensor
             
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
         bleu_per_epoch += bleu_per_batch
 
+    torch.save(bleu_per_sentences, "graphs/data/bleu_per_sentences")
     return bleu_per_epoch / len(dataset_loader)

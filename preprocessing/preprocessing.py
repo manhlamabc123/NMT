@@ -42,7 +42,7 @@ def tensor_transform(token_ids: List[int]):
                       torch.tensor(token_ids),
                       torch.tensor([EOS_IDX])))
 
-def data_preprocessing() -> None:
+def data_preprocessing(sort=False) -> None:
     data_dir = "data/Kaggle/"
     en_sents = open(data_dir + 'en_sentences.txt', "r").read().splitlines()
     vi_sents = open(data_dir + 'vi_sentences.txt', "r").read().splitlines()
@@ -51,6 +51,9 @@ def data_preprocessing() -> None:
             "vi": [line for line in vi_sents[:LINES]],
         }
     df = pd.DataFrame(raw_data, columns=["en", "vi"])
+    if sort == True:
+        s = df.en.str.len().sort_values().index
+        df.reindex(s)
     df = preprocessing(df)
 
     # Split data to tran test set
