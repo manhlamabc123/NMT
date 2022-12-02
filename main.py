@@ -34,21 +34,31 @@ if args.train:
     SRC_VOCAB_SIZE = len(vocab_transform[SRC_LANGUAGE])
     TGT_VOCAB_SIZE = len(vocab_transform[TGT_LANGUAGE])
 
+    # print("Initialize model...\n")
+    # if args.model == "gru":
+    #     model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+    # elif args.model == "attention":
+    #     model = Seq2SeqAttentionGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+    # elif args.model == "transformer":
+    #     model = Transformer(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+    # else:
+    #     model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+
     print("Initialize model...\n")
     if args.model == "gru":
-        model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+        model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE)
     elif args.model == "attention":
-        model = Seq2SeqAttentionGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+        model = Seq2SeqAttentionGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE)
     elif args.model == "transformer":
-        model = Transformer(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+        model = Transformer(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE)
     else:
-        model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE).to(DEVICE)
+        model = Seq2SeqBiGRU(SRC_VOCAB_SIZE, TGT_VOCAB_SIZE)
     
-    print(f"Start training with {model.name}...\n")
-    if args.model == "transformer":
-        train_transformer(model, train_set_loader, dev_set_loader, vocab_transform)
-    else:
-        train(model, train_set_loader, dev_set_loader, vocab_transform)
+    # print(f"Start training with {model.name}...\n")
+    # if args.model == "transformer":
+    #     train_transformer(model, train_set_loader, dev_set_loader, vocab_transform)
+    # else:
+    #     train(model, train_set_loader, dev_set_loader, vocab_transform)
 
     plot_loss(model)
 
