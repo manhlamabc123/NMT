@@ -21,9 +21,9 @@ def translate(dataset_loader, model, vocab_transform):
 
         # From Tensors to Sentences -> Calculate Bleu on sentence
         for j in range(BATCH_SIZE):
-            translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "")
-            translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "")
-            translated_target = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(target[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "")
+            translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
+            translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
+            translated_target = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(target[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
             bleu_per_tensor = sentence_bleu(translated_target, translated_output, weights=(1.0, 0, 0, 0))
 
             print(f"Input: {translated_input}")
@@ -60,9 +60,9 @@ def transformer_translate(dataset_loader, model, vocab_transform):
 
         # From Tensors to Sentences -> Calculate Bleu on sentence
         for j in range(BATCH_SIZE):
-            translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "")
-            translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "")
-            translated_target = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(target[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "")
+            translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
+            translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
+            translated_target = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(target[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
             bleu_per_tensor = sentence_bleu(translated_target, translated_output, weights=(1.0, 0, 0, 0))
 
             print(f"Input: {translated_input}")

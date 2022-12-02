@@ -42,7 +42,7 @@ def tensor_transform(token_ids: List[int]):
                       torch.tensor(token_ids),
                       torch.tensor([EOS_IDX])))
 
-def data_preprocessing(sort=False) -> None:
+def data_preprocessing() -> None:
     data_dir = "data/Kaggle/"
     en_sents = open(data_dir + 'en_sentences.txt', "r").read().splitlines()
     vi_sents = open(data_dir + 'vi_sentences.txt', "r").read().splitlines()
@@ -51,9 +51,6 @@ def data_preprocessing(sort=False) -> None:
             "vi": [line for line in vi_sents[:LINES]],
         }
     df = pd.DataFrame(raw_data, columns=["en", "vi"])
-    if sort == True:
-        s = df.en.str.len().sort_values().index
-        df.reindex(s)
     df = preprocessing(df)
 
     # Split data to tran test set
@@ -73,11 +70,16 @@ def data_preprocessing(sort=False) -> None:
     torch.save(test_ds, 'data/preprocessed/test')
     torch.save(df, 'data/preprocessed/df')
 
-def load_data() -> Tuple[DataLoader, DataLoader, DataLoader]:
+def load_data(sort=False) -> Tuple[DataLoader, DataLoader, DataLoader]:
     train_ds = torch.load('data/preprocessed/train')
     val_ds = torch.load('data/preprocessed/val')
     test_ds = torch.load('data/preprocessed/test')
     df = torch.load('data/preprocessed/df')
+
+    if sort == True:
+        train_ds.sort(key=lambda x: len(x[0]))
+        val_ds.sort(key=lambda x: len(x[0]))
+        test_ds.sort(key=lambda x: len(x[0]))
 
     # Place-holders
     token_transform = {}
