@@ -59,13 +59,25 @@ def plot_bleu(model):
     plt.figure().clear()
 
 def plot_bleu_per_sentence(model):
-    plot_bleu_per_sentence = torch.load('graphs/data/bleu_per_sentences')
-    plot_input_lengths = torch.load("graphs/data/inputs_length")
+    bleu_per_sentence = torch.load('graphs/data/bleu_per_sentences')
+    input_lengths = torch.load("graphs/data/inputs_length")
     time_stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 
+    plot_bleu_per_sentence = []
+    plot_input_lengths = []
+
+    for i in range(len(input_lengths)):
+        if i % 25 == 0:
+            plot_bleu_per_sentence.append(bleu_per_sentence[i])
+            plot_input_lengths.append(input_lengths[i])
+
+    index = np.argsort(plot_input_lengths)
+    plot_bleu_per_sentence
+
+    plt.figure(figsize=(10, 6))
     plt.title(f'{model.name}: Bleu score on each sentence, length increase')
-    plt.barh(plot_input_lengths[:30], plot_bleu_per_sentence[:30])
-    plt.yticks(plot_input_lengths[:30])
+    plt.bar(range(len(plot_bleu_per_sentence)), plot_bleu_per_sentence)
+    plt.xticks(range(len(plot_bleu_per_sentence)), plot_input_lengths)
     plt.ylabel("Sentence's length")
     plt.xlabel('Bleu Score')
 

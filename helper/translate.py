@@ -75,7 +75,7 @@ def transformer_translate(dataset_loader, model, vocab_transform, stop=False):
             print("\n")
 
             bleu_per_sentences.append(bleu_per_tensor)
-            input_lengths.append(f"{i}-{j}_{len(translated_input)}")
+            input_lengths.append(len(translated_input))
             bleu_per_batch += bleu_per_tensor
             
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
