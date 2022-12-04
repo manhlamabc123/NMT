@@ -24,7 +24,7 @@ def translate(dataset_loader, model, vocab_transform):
             translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
             translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
             translated_target = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(target[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
-            bleu_per_tensor = sentence_bleu(translated_target, translated_output, weights=(1.0, 0, 0, 0))
+            bleu_per_tensor = sentence_bleu([translated_target], translated_output, weights=(1.0, 0, 0, 0))
 
             print(f"Input: {translated_input}")
             print(f"Target: {translated_target}")
@@ -33,20 +33,23 @@ def translate(dataset_loader, model, vocab_transform):
             print("\n")
 
             bleu_per_sentences.append(bleu_per_tensor)
-            input_lengths.append(len(translated_input))
+            if len(translated_input) not in input_lengths:
+                input_lengths.append(len(translated_input))
             bleu_per_batch += bleu_per_tensor
 
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
         bleu_per_epoch += bleu_per_batch
 
+    print(input_lengths)
     torch.save(bleu_per_sentences, "graphs/data/bleu_per_sentences")
     torch.save(input_lengths, "graphs/data/inputs_length")
     return bleu_per_epoch / len(dataset_loader)
 
-def transformer_translate(dataset_loader, model, vocab_transform):
+def transformer_translate(dataset_loader, model, vocab_transform, stop=False):
     bleu_per_epoch = 0
     model.eval()
     bleu_per_sentences = []
+    input_lengths = []
 
     for i, data in enumerate(dataset_loader):
         input, target = data
@@ -63,7 +66,7 @@ def transformer_translate(dataset_loader, model, vocab_transform):
             translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
             translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
             translated_target = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(target[:, j].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
-            bleu_per_tensor = sentence_bleu(translated_target, translated_output, weights=(1.0, 0, 0, 0))
+            bleu_per_tensor = sentence_bleu([translated_target], translated_output, weights=(1.0, 0, 0, 0))
 
             print(f"Input: {translated_input}")
             print(f"Target: {translated_target}")
@@ -72,10 +75,12 @@ def transformer_translate(dataset_loader, model, vocab_transform):
             print("\n")
 
             bleu_per_sentences.append(bleu_per_tensor)
+            input_lengths.append(f"{i}-{j}_{len(translated_input)}")
             bleu_per_batch += bleu_per_tensor
             
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
         bleu_per_epoch += bleu_per_batch
 
     torch.save(bleu_per_sentences, "graphs/data/bleu_per_sentences")
+    torch.save(input_lengths, "graphs/data/inputs_length")
     return bleu_per_epoch / len(dataset_loader)
