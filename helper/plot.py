@@ -91,12 +91,10 @@ def plot_attention(dataset_loader, outputs, attentions, vocab_transform, batch_s
         output = outputs[i]
 
         for batch in range(batch_size):
-            print(input[:, batch].shape, output[:, batch].shape)
-            print(attention[:, batch].shape)
             plot_attention = attention[:, batch].cpu().detach().numpy()
 
-            translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, batch].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
-            translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, batch].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
+            translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, batch].cpu().numpy()))).strip().split(" ")
+            translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, batch].cpu().numpy()))).strip().split(" ")
 
             fig = plt.figure()
             ax = fig.add_subplot(111)
@@ -104,16 +102,12 @@ def plot_attention(dataset_loader, outputs, attentions, vocab_transform, batch_s
             fig.colorbar(cax)
 
             # Set up axes
-            ax.set_xticklabels(translated_output, rotation=90)
-            ax.set_yticklabels(translated_input)
+            ax.set_yticklabels(["<sos>"] + translated_output, rotation=90)
+            ax.set_xticklabels(["<sos>"] + translated_input)
 
             # Show label at every tick
             ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
             ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
-            plt.savefig(f"graphs/graphs/attention_visual_batch-{i}_item-{batch}.png")
+            plt.savefig(f"graphs/graphs/attention_visual(s)/attention_visual_batch-{i}_item-{batch}.png")
             plt.figure().clear()
-
-            break
-
-        break
