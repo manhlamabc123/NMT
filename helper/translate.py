@@ -33,19 +33,18 @@ def translate(dataset_loader, model, vocab_transform):
             print("\n")
 
             bleu_per_sentences.append(bleu_per_tensor)
-            if len(translated_input) not in input_lengths:
-                input_lengths.append(len(translated_input))
+            input_lengths.append(len(translated_input))
             bleu_per_batch += bleu_per_tensor
 
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
         bleu_per_epoch += bleu_per_batch
 
     print(input_lengths)
-    torch.save(bleu_per_sentences, "graphs/data/bleu_per_sentences")
-    torch.save(input_lengths, "graphs/data/inputs_length")
+    torch.save(bleu_per_sentences, f"graphs/data/bleu_per_sentences_{model.name}")
+    torch.save(input_lengths, f"graphs/data/inputs_length_{model.name}")
     return bleu_per_epoch / len(dataset_loader)
 
-def transformer_translate(dataset_loader, model, vocab_transform, stop=False):
+def transformer_translate(dataset_loader, model, vocab_transform):
     bleu_per_epoch = 0
     model.eval()
     bleu_per_sentences = []
@@ -81,6 +80,6 @@ def transformer_translate(dataset_loader, model, vocab_transform, stop=False):
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
         bleu_per_epoch += bleu_per_batch
 
-    torch.save(bleu_per_sentences, "graphs/data/bleu_per_sentences")
-    torch.save(input_lengths, "graphs/data/inputs_length")
+    torch.save(bleu_per_sentences, f"graphs/data/bleu_per_sentences_{model.name}")
+    torch.save(input_lengths, f"graphs/data/inputs_length_{model.name}")
     return bleu_per_epoch / len(dataset_loader)
