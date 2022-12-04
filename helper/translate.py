@@ -39,9 +39,8 @@ def translate(dataset_loader, model, vocab_transform):
         bleu_per_batch = bleu_per_batch / BATCH_SIZE
         bleu_per_epoch += bleu_per_batch
 
-    print(input_lengths)
     torch.save(bleu_per_sentences, f"graphs/data/bleu_per_sentences_{model.name}")
-    torch.save(input_lengths, f"graphs/data/inputs_length_{model.name}")
+    torch.save(input_lengths, f"graphs/data/inputs_length")
     return bleu_per_epoch / len(dataset_loader)
 
 def transformer_translate(dataset_loader, model, vocab_transform):
@@ -81,5 +80,5 @@ def transformer_translate(dataset_loader, model, vocab_transform):
         bleu_per_epoch += bleu_per_batch
 
     torch.save(bleu_per_sentences, f"graphs/data/bleu_per_sentences_{model.name}")
-    torch.save(input_lengths, f"graphs/data/inputs_length_{model.name}")
+    torch.save(input_lengths, f"graphs/data/inputs_length")
     return bleu_per_epoch / len(dataset_loader)

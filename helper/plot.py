@@ -60,7 +60,7 @@ def plot_bleu(model):
 
 def plot_bleu_per_sentence(model):
     bleu_per_sentence = torch.load(f'graphs/data/bleu_per_sentences_{model.name}')
-    input_lengths = torch.load(f"graphs/data/inputs_length_{model.name}")
+    input_lengths = torch.load(f"graphs/data/inputs_length")
     time_stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 
     plot_bleu_per_sentence = []
