@@ -13,7 +13,8 @@ class DecoderAttentionGRU(nn.Module):
         self.embedding = nn.Embedding(output_size, embedding_size)
         self.dropout = nn.Dropout(dropout_rate)
 
-        self.energy = nn.Linear(3*hidden_size, 1)
+        self.energy1 = nn.Linear(3*hidden_size, hidden_size)
+        self.energy2 = nn.Linear(hidden_size, 1)
         self.softmax = nn.Softmax(dim=0)
         self.relu = nn.ReLU()
 
@@ -35,7 +36,7 @@ class DecoderAttentionGRU(nn.Module):
         # (1, BATCH_SIZE, HIDDEN_SIZE) -> (input's sequence_length, BATCH_SIZE, HIDDEN_SIZE)
         hidden_state = torch.cat((decoder_hidden_state_expaned, encoder_hidden_states), dim=2)
         # (input's sequence_length, BATCH_SIZE, 3*HIDDEN_SIZE)
-        attention_score = self.energy(hidden_state) # (input's sequence_length, BATCH_SIZE, 1)
+        attention_score = self.energy2(torch.relu(self.energy1(hidden_state))) # (input's sequence_length, BATCH_SIZE, 1)
         attention_distribution = self.softmax(attention_score) # (input's sequence_length, BATCH_SIZE, 1)
         attention_output = torch.bmm(attention_distribution.permute(1, 2, 0), encoder_hidden_states.permute(1, 0, 2)) 
         # (BATCH_SIZE, 1, 2*HIDDEN_SIZE)
