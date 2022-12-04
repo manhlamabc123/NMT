@@ -63,7 +63,7 @@ def data_preprocessing(sort=False) -> None:
     test = df.iloc[split + int((df.shape[0] - split) / 2):]
     test_ds = list(zip(test['en'], test['vi']))
 
-    if not sort:
+    if sort:
         test_ds.sort(key=lambda x: len(x[0]))
 
     print(len(train_ds), len(val_ds), len(test_ds))
