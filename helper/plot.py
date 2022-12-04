@@ -2,7 +2,9 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch import Tensor
+from hyperparameters import *
+from constants import *
+import matplotlib.ticker as ticker
 
 def plot_loss(model):
     plot_train_loss = torch.load(f'graphs/data/{model.name}_train_loss')
@@ -62,24 +64,43 @@ def plot_bleu_per_sentence(model):
     time_stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 
     plt.title(f'{model.name}: Bleu score on each sentence, length increase')
-    plt.plit(x=plot_bleu_per_sentence, y=plot_input_lengths, kind="bar", rot=0)
-    plt.xlabel("Sentence's length")
-    plt.ylabel('Bleu Score')
+    plt.barh(plot_input_lengths[:30], plot_bleu_per_sentence[:30])
+    plt.yticks(plot_input_lengths[:30])
+    plt.ylabel("Sentence's length")
+    plt.xlabel('Bleu Score')
 
     plt.savefig(f"graphs/graphs/bleu_per_sentence_{model.name}_{time_stamp}.png")
     plt.figure().clear()
 
-def plot_attention(dataset_loader, attentions, vocab_transform):
-    batch_size = attentions.shape[1]
+def plot_attention(dataset_loader, outputs, attentions, vocab_transform, batch_size=BATCH_SIZE):
     for i, data in enumerate(dataset_loader):
-        input, target = data
+        input, _ = data
         attention = attentions[i]
+        output = outputs[i]
 
         for batch in range(batch_size):
-            plot_x = input[:, batch].cpu().detach().numpy()
-            plot_y = target[:, batch].cpu().detech().numpy()
-            plot_attention = attention[:, batch]
-            print(plot_x, plot_y, plot_attention)
+            print(input[:, batch].shape, output[:, batch].shape)
+            print(attention[:, batch].shape)
+            plot_attention = attention[:, batch].cpu().detach().numpy()
+
+            translated_input = " ".join(vocab_transform[SRC_LANGUAGE].lookup_tokens(list(input[:, batch].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
+            translated_output = " ".join(vocab_transform[TGT_LANGUAGE].lookup_tokens(list(output[:, batch].cpu().numpy()))).replace("<bos>", "").replace("<eos>", "").replace('<pad>', "").strip().split(" ")
+
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            cax = ax.matshow(plot_attention, cmap='bone')
+            fig.colorbar(cax)
+
+            # Set up axes
+            ax.set_xticklabels(translated_output, rotation=90)
+            ax.set_yticklabels(translated_input)
+
+            # Show label at every tick
+            ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+            ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+
+            plt.savefig(f"graphs/graphs/attention_visual_batch-{i}_item-{batch}.png")
+            plt.figure().clear()
 
             break
 
