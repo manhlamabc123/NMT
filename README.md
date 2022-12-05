@@ -37,7 +37,7 @@
   * underthesea 1.3.5
   
 ## Dataset
-* Source: [Kaggle]{https://www.kaggle.com/datasets/hungnm/englishvietnamese-translation}
+* Source: [Kaggle](https://www.kaggle.com/datasets/hungnm/englishvietnamese-translation)
 * Already downloaded in `data` folder
 
 ## How to run
@@ -80,3 +80,5 @@ This only works with `attention` model
 * [This tutorial on creating a Chatbot using Seq2Seq](https://pytorch.org/tutorials/beginner/chatbot_tutorial.html)
 * [This tutorial on training with PyTorch](https://pytorch.org/tutorials/beginner/introyt/trainingyt.html)
 * [This blog on NMT](https://medium.com/@rishikesh_d/neural-machine-translation-a-comprehensive-guide-ef414e79b49)
+* [Code for Transformer](https://www.kaggle.com/code/huhuyngun/english-to-vietnamese-with-transformer)
+* [Code for Attention mechanism](https://www.kaggle.com/code/minhhngchong/machine-translation-en-to-vi-with-attention)
