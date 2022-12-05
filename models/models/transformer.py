@@ -4,7 +4,6 @@ from constants import *
 from models.components.positional_encoding import PositionalEncoding
 import math
 from torch import Tensor
-from helper.teacher_forcing import teacher_forcing
 from helper.transformer import *
 
 class Transformer(nn.Module):
