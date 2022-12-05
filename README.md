@@ -34,6 +34,7 @@
   * nltk 3.7
   * matplotlib 3.5.2
   * pandas 1.5.1
+  * underthesea 1.3.5
   
 ## Dataset
 * Source: [Kaggle]{https://www.kaggle.com/datasets/hungnm/englishvietnamese-translation}
