@@ -16,7 +16,7 @@
 
 * The actually first project AI that I created from scratch (From Data Processing to Create Model, Train & Evalute, ...)
 * This project is created to test multiple Model Seq2Seq on the same dataset
-* Statuse: **In Progress**. The project is ready, just the code base right now is very messy.
+* Statuse: **Finished**. The project is ready, just the code base right now is very messy.
 
 ## Architecture
 
